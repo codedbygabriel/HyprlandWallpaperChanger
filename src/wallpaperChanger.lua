@@ -44,14 +44,33 @@ local function getWallpapersFromDir()
 	end
 end
 
+local function setWallpaper(pathToWallpaper)
+	local cmd = string.format('hyprctl hyprpaper wallpaper "eDP-1,%s"', pathToWallpaper)
+	os.execute(cmd)
+end
+
 local function randomizeWallpaper(wallpaperTable)
 	local index = math.random(1, #wallpaperTable)
 	local selectedWallpaper = wallpaperTable[index]
-	local cmd = string.format('hyprctl hyprpaper wallpaper "eDP-1,%s"', selectedWallpaper)
-	os.execute(cmd)
+	setWallpaper(selectedWallpaper)
+end
+
+local function selectWallpaper(wallpaperTable)
+	for index, value in pairs(wallpaperTable) do
+		io.write(index .. ")" .. " - " .. value .. "\n")
+	end
+	io.write("Feeling Lucky? Go with a 'random' then.\n")
+
+	io.write("From 1 - " .. #wallpaperTable .. " select your wallpaper! => ")
+	local indexSelected = io.read()
+	if indexSelected == "random" then
+		randomizeWallpaper(wallpaperTable)
+	else
+		setWallpaper(wallpaperTable[indexSelected])
+	end
 end
 
 getLoadedWallpapers()
 getWallpapersFromDir()
 loadWallpapers(wallpapersList)
-randomizeWallpaper(wallpapersList)
+selectWallpaper(wallpapersList)
