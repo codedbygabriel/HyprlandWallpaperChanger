@@ -66,7 +66,7 @@ local function selectWallpaper(wallpaperTable)
 	if indexSelected == "random" then
 		randomizeWallpaper(wallpaperTable)
 	else
-		setWallpaper(wallpaperTable[indexSelected])
+		setWallpaper(wallpaperTable[tonumber(indexSelected)])
 	end
 end
 
