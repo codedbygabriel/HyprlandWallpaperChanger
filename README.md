@@ -22,4 +22,4 @@
     - <code>lua src/wallpaperChanger.lua</code>
 
 ## Usage Example
-![Usage](media/example.gif) 
+![Usage](./media/example.gif) 
