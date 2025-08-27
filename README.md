@@ -20,3 +20,6 @@
     2. Throw your jpegs, jpg, whatever extention there.
 3. Run! 
     - <code>lua src/wallpaperChanger.lua</code>
+
+## Usage Example
+![Usage](media/example.gif) 
