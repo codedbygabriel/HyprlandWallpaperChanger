@@ -10,16 +10,19 @@
 
 ## Program Usage
 
-1. Pre-requesits 
-    - Hyprpaper / Hyprland
-    - Lua
-    - Lua rocks
-    - LFS (luafilesystem)
+1. Pre-requesits
+   - Hyprpaper / Hyprland
+   - Lua
+   - Lua rocks
+   - LFS (luafilesystem)
 2. Setting your wallpapers
-    1. On your home directory a.k.a "~/" create a directory called "Wallpapers".
-    2. Throw your jpegs, jpg, whatever extention there.
-3. Run! 
-    - <code>lua src/wallpaperChanger.lua</code>
+   1. On your home directory a.k.a "~/" create a directory called "Wallpapers".
+   2. Throw your jpegs, jpg, whatever extention there.
+3. Run!
+   - **Daemon Startup** `lua src/wallpaperChanger.lua --daemon [time]`
+     - **Daemon Startup + Nohup (Make lua run on background)** `nohup lua src/wallpaperChanger.lua --daemon [time] &`
+   - **Select Startup** `lua src/wallpaperChanger.lua --select`
 
 ## Usage Example
-![Usage](./media/example.gif) 
+
+![Usage](./media/example.gif)
