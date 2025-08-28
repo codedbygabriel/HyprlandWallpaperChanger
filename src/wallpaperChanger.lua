@@ -13,7 +13,7 @@ local function findMonitor()
 		local startIndex, _ = string.find(output, "Monitor")
 
 		if startIndex ~= nil then
-			local dump = {} -- dump array, for sake of my sanity
+			local dump = {}                    -- dump array, for sake of my sanity
 			for line in string.gmatch(output, "%S+") do -- equivalent of split i guess
 				table.insert(dump, line)
 			end
@@ -128,14 +128,39 @@ local function switchWallpaperDaemon(wallpaperTable, time)
 			print(passedTime)
 			startTime = os.clock()
 			passedTime = 0
+
+			getLoadedWallpapers()
+			getWallpapersFromDir()
 			randomizeWallpaper(wallpaperTable, true)
 		end
 	end
 end
 
-findMonitor()
-getLoadedWallpapers()
-getWallpapersFromDir()
-loadWallpapers(wallpapersList)
---selectWallpaper(wallpapersList)
-switchWallpaperDaemon(wallpapersList, 20)
+local function init()
+	findMonitor()
+	getLoadedWallpapers()
+	getWallpapersFromDir()
+	loadWallpapers(wallpapersList)
+end
+
+if #arg >= 1 then
+	for index, value in ipairs(arg) do
+		local defaultTime = 20
+		if value == "--daemon" then
+			if arg[2] then
+				defaultTime = tonumber(arg[2])
+			end
+			init()
+			switchWallpaperDaemon(wallpapersList, defaultTime)
+			break
+		end
+		if value == "--select" then
+			init()
+			selectWallpaper(wallpapersList)
+			break
+		end
+		print("Not Valid Input\n--daemon [time]\n--select")
+	end
+else
+	print("Not enough arguments provided, try --daemon [time] or --select.")
+end
