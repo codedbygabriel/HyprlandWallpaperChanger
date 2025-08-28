@@ -68,10 +68,11 @@ local function setWallpaper(pathToWallpaper, isOnDaemon)
 		isOnDaemon = false
 	end
 
+	print(isOnDaemon) -- true (se estiver no daemon)
 	local cmd = ""
 	if #monitorList > 1 then
 		for index, currentMonitor in ipairs(monitorList) do
-			if not isOnDaemon then
+			if isOnDaemon == false then
 				io.write(string.format("Apply %s to %s? (y/n) =>", pathToWallpaper, currentMonitor))
 				local res = io.read()
 
@@ -91,7 +92,6 @@ local function setWallpaper(pathToWallpaper, isOnDaemon)
 end
 
 local function randomizeWallpaper(wallpaperTable, isOnDaemon)
-	print(isOnDaemon)
 	local index = math.random(1, #wallpaperTable)
 	local selectedWallpaper = wallpaperTable[index]
 
