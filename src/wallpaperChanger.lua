@@ -91,9 +91,11 @@ local function setWallpaper(pathToWallpaper, isOnDaemon)
 end
 
 local function randomizeWallpaper(wallpaperTable, isOnDaemon)
+	print(isOnDaemon)
 	local index = math.random(1, #wallpaperTable)
 	local selectedWallpaper = wallpaperTable[index]
-	if not isOnDaemon then
+
+	if isOnDaemon then
 		setWallpaper(selectedWallpaper, isOnDaemon)
 	else
 		setWallpaper(selectedWallpaper)
