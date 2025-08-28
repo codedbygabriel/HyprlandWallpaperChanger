@@ -2,9 +2,28 @@ local lfs = require("lfs")
 local path = string.format("/home/%s/Wallpapers", os.getenv("USER"))
 
 local wallpapersList = {}
+local monitorList = {}
+
+local function findMonitor()
+	-- As it says, finds the correct nomenclature to the monitors, and adds them to monitorList.
+	local cmd = "hyprctl monitors all"
+	local res = io.popen(cmd)
+
+	for output in res:lines("l") do
+		local startIndex, _ = string.find(output, "Monitor")
+
+		if startIndex ~= nil then
+			local dump = {}                    -- dump array, for sake of my sanity
+			for line in string.gmatch(output, "%S+") do -- equivalent of split i guess
+				table.insert(dump, line)
+			end
+			table.insert(monitorList, dump[2]) -- Gets the hdmi/edpi/etc
+		end
+	end
+end
 
 local function getLoadedWallpapers()
-	-- uses the output of hyprctl do define the initial table
+	-- Gets already loaded in memory wallpapers and inserts them into the list
 	local cmd = "hyprctl hyprpaper listloaded"
 	local res = io.popen(cmd, "r")
 	for line in res:lines("l") do
@@ -45,8 +64,21 @@ local function getWallpapersFromDir()
 end
 
 local function setWallpaper(pathToWallpaper)
-	local cmd = string.format('hyprctl hyprpaper wallpaper "eDP-1,%s"', pathToWallpaper)
-	os.execute(cmd)
+	local cmd = ""
+	if #monitorList > 1 then
+		for index, currentMonitor in ipairs(monitorList) do
+			io.write(string.format("Apply %s to %s? (y/n) =>", pathToWallpaper, currentMonitor))
+			local res = io.read()
+
+			if res == "y" then
+				cmd = string.format('hyprctl hyprpaper wallpaper "%s,%s"', currentMonitor, pathToWallpaper)
+				os.execute(cmd)
+			end
+		end
+	else
+		cmd = string.format('hyprctl hyprpaper wallpaper "%s,%s"', monitorList[1], pathToWallpaper)
+		os.execute(cmd)
+	end
 end
 
 local function randomizeWallpaper(wallpaperTable)
@@ -70,7 +102,25 @@ local function selectWallpaper(wallpaperTable)
 	end
 end
 
+local function switchWallpaperDaemon(wallpaperTable, time)
+	local startTime = os.clock()
+	local timer = time
+	randomizeWallpaper(wallpaperTable)
+
+	while true do
+		local passedTime = os.clock() - startTime
+		if passedTime > timer then
+			print(passedTime)
+			startTime = os.clock()
+			passedTime = 0
+			randomizeWallpaper(wallpaperTable)
+		end
+	end
+end
+
+findMonitor()
 getLoadedWallpapers()
 getWallpapersFromDir()
 loadWallpapers(wallpapersList)
 selectWallpaper(wallpapersList)
+--switchWallpaperDaemon(wallpapersList, 20)
