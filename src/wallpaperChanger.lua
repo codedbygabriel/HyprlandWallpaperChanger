@@ -13,7 +13,7 @@ local function findMonitor()
 		local startIndex, _ = string.find(output, "Monitor")
 
 		if startIndex ~= nil then
-			local dump = {}                    -- dump array, for sake of my sanity
+			local dump = {} -- dump array, for sake of my sanity
 			for line in string.gmatch(output, "%S+") do -- equivalent of split i guess
 				table.insert(dump, line)
 			end
@@ -63,14 +63,23 @@ local function getWallpapersFromDir()
 	end
 end
 
-local function setWallpaper(pathToWallpaper)
+local function setWallpaper(pathToWallpaper, isOnDaemon)
+	if isOnDaemon == nil then
+		isOnDaemon = false
+	end
+
 	local cmd = ""
 	if #monitorList > 1 then
 		for index, currentMonitor in ipairs(monitorList) do
-			io.write(string.format("Apply %s to %s? (y/n) =>", pathToWallpaper, currentMonitor))
-			local res = io.read()
+			if not isOnDaemon then
+				io.write(string.format("Apply %s to %s? (y/n) =>", pathToWallpaper, currentMonitor))
+				local res = io.read()
 
-			if res == "y" then
+				if res == "y" then
+					cmd = string.format('hyprctl hyprpaper wallpaper "%s,%s"', currentMonitor, pathToWallpaper)
+					os.execute(cmd)
+				end
+			else
 				cmd = string.format('hyprctl hyprpaper wallpaper "%s,%s"', currentMonitor, pathToWallpaper)
 				os.execute(cmd)
 			end
@@ -81,10 +90,14 @@ local function setWallpaper(pathToWallpaper)
 	end
 end
 
-local function randomizeWallpaper(wallpaperTable)
+local function randomizeWallpaper(wallpaperTable, isOnDaemon)
 	local index = math.random(1, #wallpaperTable)
 	local selectedWallpaper = wallpaperTable[index]
-	setWallpaper(selectedWallpaper)
+	if not isOnDaemon then
+		setWallpaper(selectedWallpaper, isOnDaemon)
+	else
+		setWallpaper(selectedWallpaper)
+	end
 end
 
 local function selectWallpaper(wallpaperTable)
@@ -105,7 +118,7 @@ end
 local function switchWallpaperDaemon(wallpaperTable, time)
 	local startTime = os.clock()
 	local timer = time
-	randomizeWallpaper(wallpaperTable)
+	randomizeWallpaper(wallpaperTable, true)
 
 	while true do
 		local passedTime = os.clock() - startTime
@@ -113,7 +126,7 @@ local function switchWallpaperDaemon(wallpaperTable, time)
 			print(passedTime)
 			startTime = os.clock()
 			passedTime = 0
-			randomizeWallpaper(wallpaperTable)
+			randomizeWallpaper(wallpaperTable, true)
 		end
 	end
 end
@@ -122,5 +135,5 @@ findMonitor()
 getLoadedWallpapers()
 getWallpapersFromDir()
 loadWallpapers(wallpapersList)
-selectWallpaper(wallpapersList)
---switchWallpaperDaemon(wallpapersList, 20)
+--selectWallpaper(wallpapersList)
+switchWallpaperDaemon(wallpapersList, 20)
